@@ -6,6 +6,7 @@
 #include "level.h"
 #include "pathpreview.h"
 #include "conf.h"
+#include "levelselect.h"
 
 #include <sp2/io/filesystem.h>
 #include <sp2/graphics/gui/loader.h>
@@ -17,6 +18,7 @@
 #include <sp2/math/plane.h>
 
 sp::io::Keybinding key_space{"SPACE", " "};
+sp::io::Keybinding key_exit{"EXIT", {"Escape", "AC Back"}};
 sp::io::Keybinding key_q{"Q", "q"};
 sp::io::Keybinding key_a{"A", "a"};
 sp::io::Keybinding key_z{"Z", "z"};
@@ -36,16 +38,16 @@ sp::io::Keybinding key_v{"V", "v"};
 
 Scene::Scene(int save_index) : sp::Scene("MAIN") {
     goal_gui = sp::gui::Loader::load("gui/hud.gui", "GOAL");
-    auto gui = sp::gui::Loader::load("gui/hud.gui", "SPEED_CONTROLS");
-    gui->getWidgetWithID("STOP")->setEventCallback([this](sp::Variant v){
+    speed_gui = sp::gui::Loader::load("gui/hud.gui", "SPEED_CONTROLS");
+    speed_gui->getWidgetWithID("STOP")->setEventCallback([this](sp::Variant v){
         stop();
     });
-    gui->getWidgetWithID("PLAY")->setEventCallback([this](sp::Variant v){
+    speed_gui->getWidgetWithID("PLAY")->setEventCallback([this](sp::Variant v){
         start();
         if (state == State::Run)
             sp::Engine::getInstance()->setGameSpeed(1.0f);
     });
-    gui->getWidgetWithID("FASTER")->setEventCallback([this](sp::Variant v){
+    speed_gui->getWidgetWithID("FASTER")->setEventCallback([this](sp::Variant v){
         start();
         if (state == State::Run)
             sp::Engine::getInstance()->setGameSpeed(std::min(64.0f, sp::Engine::getInstance()->getGameSpeed() * 2.0f));
@@ -97,6 +99,15 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     buildRobos();
     sp::Engine::getInstance()->setGameSpeed(0.0);
     this->save_index = save_index;
+    onFixedUpdate();
+}
+
+Scene::~Scene()
+{
+    action_bar.destroy();
+    speed_gui.destroy();
+    goal_gui.destroy();
+    finished_screen.destroy();
 }
 
 void Scene::onUpdate(float delta)
@@ -104,6 +115,15 @@ void Scene::onUpdate(float delta)
     if (key_space.getDown()) {
         if (state == State::Build) start(); else stop();
     }
+    if (key_exit.getDown()) {
+        saveGrid(sp::io::preferencePath() + level.key + "." + sp::string(save_index) + ".save");
+        delete this;
+        openLevelSelect();
+    }
+}
+
+void Scene::onFixedUpdate()
+{
     int done = 0;
     int required = 0;
     for(auto n : getRoot()->getChildren()) {
@@ -115,6 +135,34 @@ void Scene::onUpdate(float delta)
     }
 
     goal_gui->getWidgetWithID("LABEL")->setAttribute("caption", "Goal: " + sp::string(done) + "/" + sp::string(required));
+    if (state == State::Run) {
+        if (done == required) {
+            state = State::Finished;
+            sp::Engine::getInstance()->setGameSpeed(0.0);
+            finished_screen = sp::gui::Loader::load("gui/hud.gui", "FINISHED");
+            finished_screen->getWidgetWithID("CONTINUE")->setEventCallback([this](sp::Variant) {
+                stop();
+            });
+            finished_screen->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant) {
+                delete this;
+                openLevelSelect();
+            });
+            int actions = 0;
+            for(auto [p, a] : action_grid) if (a != GridAction::None) actions++;
+            int footprint = 0;
+            for(auto [p, used] : footprint_grid) if (used) footprint++;
+            finished_screen->getWidgetWithID("CYCLES")->getWidgetWithID("AMOUNT")->setAttribute("caption", sp::string(cycles));
+            finished_screen->getWidgetWithID("ACTIONS")->getWidgetWithID("AMOUNT")->setAttribute("caption", sp::string(actions));
+            finished_screen->getWidgetWithID("FOOTPRINT")->getWidgetWithID("AMOUNT")->setAttribute("caption", sp::string(footprint));
+
+            level_finished_info[level.key].cycles = std::min(level_finished_info[level.key].cycles, cycles);
+            level_finished_info[level.key].actions = std::min(level_finished_info[level.key].actions, actions);
+            level_finished_info[level.key].footprint = std::min(level_finished_info[level.key].footprint, footprint);
+            saveLevelFinishedInfo();
+        } else {
+            cycles += 1;
+        }
+    }
 }
 
 void Scene::start()
@@ -127,9 +175,11 @@ void Scene::start()
         sp::Engine::getInstance()->setGameSpeed(1.0);
         action_bar->hide();
         saveGrid(sp::io::preferencePath() + level.key + "." + sp::string(save_index) + ".save");
+        cycles = 0;
         break;
     case State::Run:
     case State::Error:
+    case State::Finished:
         break;
     }
 }
@@ -142,10 +192,12 @@ void Scene::stop()
         break;
     case State::Run:
     case State::Error:
+    case State::Finished:
         state = State::Build;
         sp::Engine::getInstance()->setGameSpeed(0.0);
         buildRobos();
         action_bar->show();
+        onFixedUpdate();
         break;
     }
 }
@@ -208,6 +260,7 @@ void Scene::buildRobos() {
         if (g)
             g->done = 0;
     }
+    finished_screen.destroy();
     error_node.destroy();
     for(auto [p, d, c] : level.start_points) {
         auto r = new Robo(getRoot());
@@ -216,6 +269,7 @@ void Scene::buildRobos() {
         r->setPosition(gridToPos(p));
         r->direction = d;
     }
+    footprint_grid.clear();
 }
 
 static void buildGoalRecursive(sp::P<GoalNode> gn, const std::vector<LevelData::GoalBond>& bonds) {

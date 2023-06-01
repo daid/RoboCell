@@ -23,7 +23,7 @@ public:
 
     std::optional<sp::Vector2d> checkCarryCollision(sp::Vector2d world_position);
 
-    static constexpr int steps_per_action = 40;
+    static constexpr int steps_per_action = 30;
     int step = steps_per_action / 2;
     sp::Vector2i grid_position;
     Direction direction = Direction::Right;

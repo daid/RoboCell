@@ -19,6 +19,7 @@ PawnSpawn::PawnSpawn(sp::P<sp::Node> parent, sp::Vector2i position)
     render_data.color = sp::Color(1.0, 1.0, 1.0, 0.5);
     setPosition(gridToPos(position));
     grid_position = position;
+    footprint_grid.set(position, true);
 }
 
 void PawnSpawn::onFixedUpdate()
@@ -103,6 +104,7 @@ static void recursiveUpdate(std::unordered_set<Pawn*>& done, Pawn* p, sp::Vector
     p->setPosition(w);
     p->setRotation(toRotation(p->direction) + additional_rotation);
     p->grid_position = g;
+    footprint_grid.set(g, true);
     for(const auto& b : p->bonds) {
         if (done.find(*b.other) != done.end())
             continue;

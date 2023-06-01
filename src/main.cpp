@@ -60,6 +60,7 @@ int main(int argc, char** argv)
 #endif
     window->addLayer(scene_layer);
 
+    loadLevelFinishedInfo();
     openLevelSelect();
     
     engine->run();

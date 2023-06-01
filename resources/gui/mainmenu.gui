@@ -1,55 +1,56 @@
-[MAIN] {
-    stretch: true
-    layout: vertical
-    [RUN] {
-        type: button
-        caption: RUN
-        size: 100, 30
-    }
-}
-
 [LEVEL_SELECT] {
-    alignment: center
-    layout: horizontal
+    stretch: true
     {
-        type: panel
-        alignment: center
-        padding: 20
-        [LEVELS] {
-            layout: hexgrid
-        }
+        alignment: top
+        type: label
+        caption: RoboCell
+        size: 500, 100
+        text_size: 50
     }
+    
     {
-        margin: 20
-        padding: 20
-        type: panel
-        size: 200, 300
-        layout: vertical
-        
+        alignment: center
+        layout: horizontal
         {
-            stretch: true
+            type: panel
+            alignment: center
+            padding: 20
+            [LEVELS] {
+                layout: hexgrid
+            }
+        }
+        {
+            margin: 20
+            padding: 20
+            type: panel
+            size: 200, 300
             layout: vertical
-            [LEVEL_KEY] {
-                type: label
-                caption: 
+            
+            {
                 stretch: true
-                size: 1, 2
+                layout: vertical
+                [LEVEL_KEY] {
+                    type: label
+                    caption: 
+                    stretch: true
+                    size: 1, 2
+                }
+                [LEVEL_NAME] {
+                    type: label
+                    caption: 
+                    stretch: true
+                    text_size: 15
+                }
             }
-            [LEVEL_NAME] {
-                type: label
-                caption: 
-                stretch: true
-                text_size: 15
+            [SAVE1] {
+                @ref: SAVEBUTTON IDX=1
             }
-        }
-        [SAVE1] {
-            @ref: SAVEBUTTON IDX=1
-        }
-        [SAVE2] {
-            @ref: SAVEBUTTON IDX=2
-        }
-        [SAVE3] {
-            @ref: SAVEBUTTON IDX=3
+            [SAVE2] {
+                @ref: SAVEBUTTON IDX=2
+            }
+            [SAVE3] {
+                @ref: SAVEBUTTON IDX=3
+            }
         }
     }
 }

@@ -132,3 +132,70 @@
         size: 200, 30
     }
 }
+
+[FINISHED] {
+    alignment: center
+    type: panel
+    padding: 20
+    layout: vertical
+    
+    {
+        type: label
+        caption: CELL GROWTH DONE
+        size: 350, 30
+        margin: 0, 0, 0, 10
+        text_alignment: center
+    }
+    
+    {
+        layout: horizontal
+        alignment: center
+        [CYCLES] {
+            @ref: FINISHED_SCORE NAME=Cycles
+        }
+        [ACTIONS] {
+            @ref: FINISHED_SCORE NAME=Actions
+        }
+        [FOOTPRINT] {
+            @ref: FINISHED_SCORE NAME=Footprint
+        }
+    }
+    
+    {
+        layout: horizontal
+        alignment: center
+        [CONTINUE] {
+            type: button
+            size: 150, 50
+            caption: Continue
+        }
+        [EXIT] {
+            type: button
+            size: 150, 50
+            caption: Exit
+        }
+    }
+}
+
+[@FINISHED_SCORE] {
+    layout: vertical
+    padding: 10, 0
+    [HISTOGRAM] {
+        type: panel
+        size: 100, 100
+    }
+    {
+        type: label
+        caption: {NAME}
+        size: 100, 10
+        text_size: 10
+        text_alignment: center
+    }
+    [AMOUNT] {
+        type: label
+        caption: ????
+        size: 100, 10
+        text_size: 10
+        text_alignment: center
+    }
+}

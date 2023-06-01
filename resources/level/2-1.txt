@@ -1,0 +1,7 @@
+Binding in blood
+R -6 2 R #FF3333
+R -4 -1 R #3333FF
+S -4 2 blood
+S -2 -1 blood
+G 5 0 10 blood UR blood
+B 1 0 UR

@@ -1,8 +1,13 @@
 #include "level.h"
 #include <sp2/io/resourceProvider.h>
 #include <sp2/stringutil/convert.h>
+#include <sp2/io/filesystem.h>
+#include <sp2/io/keyValueTreeLoader.h>
+#include <sp2/io/keyValueTreeSaver.h>
+
 
 LevelData level;
+std::unordered_map<sp::string, LevelFinishedInfo> level_finished_info;
 
 static Direction toDirection(const sp::string& s) {
     if (s == "UR") return Direction::UpRight;
@@ -59,5 +64,29 @@ void LevelData::load(sp::string key)
                 { sp::stringutil::convert::toInt(parts[1]), sp::stringutil::convert::toInt(parts[2])},
                 toDirection(parts[3])});
         }
+    }
+}
+
+void saveLevelFinishedInfo()
+{
+    sp::KeyValueTree tree;
+    for(auto [key, data] : level_finished_info) {
+        tree.root_nodes.emplace_back();
+        tree.root_nodes.back().id = key;
+        tree.root_nodes.back().items["cycles"] = sp::string(data.cycles);
+        tree.root_nodes.back().items["actions"] = sp::string(data.actions);
+        tree.root_nodes.back().items["footprint"] = sp::string(data.footprint);
+    }
+    sp::io::KeyValueTreeSaver::save(sp::io::preferencePath() + "finished.save", tree);
+}
+
+void loadLevelFinishedInfo()
+{
+    auto tree = sp::io::KeyValueTreeLoader::loadFile(sp::io::preferencePath() + "finished.save");
+    if (!tree) return;
+    for(auto n : tree->root_nodes) {
+        level_finished_info[n.id].cycles = sp::stringutil::convert::toInt(n.items["cycles"]);
+        level_finished_info[n.id].actions = sp::stringutil::convert::toInt(n.items["actions"]);
+        level_finished_info[n.id].footprint = sp::stringutil::convert::toInt(n.items["footprint"]);
     }
 }

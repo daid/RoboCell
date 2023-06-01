@@ -18,8 +18,10 @@ void openLevelSelect()
         auto key = name.substr(6, -4);
         auto [main, sub] = key.partition("-");
         if (sub == "") continue;
-        auto x = sp::stringutil::convert::toInt(sub) - 1;
-        auto y = sp::stringutil::convert::toInt(main) - 1;
+        auto sub_i = sp::stringutil::convert::toInt(sub);
+        auto main_i = sp::stringutil::convert::toInt(main);
+        auto x = sub_i - 1;
+        auto y = main_i - 1;
         x += y / 2;
         auto ab = new sp::gui::Button(container);
         ab->setSize({60, 60});
@@ -43,6 +45,15 @@ void openLevelSelect()
                 }
             }
         });
+        bool can_play = false;
+        if (level_finished_info.find(main + "-" + sp::string(sub_i - 1)) != level_finished_info.end())
+            can_play = true;
+        if (level_finished_info.find(sp::string(main_i - 1) + "-" + sp::string(sub_i + 1)) != level_finished_info.end())
+            can_play = true;
+        if (key == "1-1")
+            can_play = true;
+        if (!can_play)
+            ab->disable();
     }
     for(int save_index=1; save_index<=3; save_index++) {
         gui->getWidgetWithID("SAVE" + sp::string(save_index))->setEventCallback([save_index](sp::Variant) {

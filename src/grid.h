@@ -21,6 +21,7 @@ enum class GridAction
 
 extern sp::InfiniGrid<GridAction> action_grid;
 extern sp::InfiniGrid<sp::P<sp::Node>> action_node_grid;
+extern sp::InfiniGrid<bool> footprint_grid;
 
 sp::Vector2d gridToPos(sp::Vector2i v);
 sp::Vector2i posToGrid(sp::Vector2d v);

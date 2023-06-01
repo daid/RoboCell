@@ -41,3 +41,13 @@ public:
     void load(sp::string key);
 };
 extern LevelData level;
+
+struct LevelFinishedInfo
+{
+    int cycles = 0;
+    int actions = 0;
+    int footprint = 0;
+};
+extern std::unordered_map<sp::string, LevelFinishedInfo> level_finished_info;
+void saveLevelFinishedInfo();
+void loadLevelFinishedInfo();

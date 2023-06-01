@@ -11,6 +11,7 @@
 
 sp::InfiniGrid<GridAction> action_grid{GridAction::None};
 sp::InfiniGrid<sp::P<sp::Node>> action_node_grid{nullptr};
+sp::InfiniGrid<bool> footprint_grid{false};
 
 sp::Vector2d gridToPos(sp::Vector2i v) {
     return {std::sqrt(3.0) * 0.5f * (v.x * 2 + v.y), v.y * 3.0f / 2.0f};
@@ -98,7 +99,6 @@ void saveGrid(const sp::string& filename)
 
 void loadGrid(const sp::string& filename)
 {
-    LOG(Debug, filename);
     action_grid.clear();
     for(auto it : action_node_grid) {
         sp::P<sp::Node>(it.data).destroy();
