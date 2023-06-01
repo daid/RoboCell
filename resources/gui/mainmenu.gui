@@ -1,0 +1,76 @@
+[MAIN] {
+    stretch: true
+    layout: vertical
+    [RUN] {
+        type: button
+        caption: RUN
+        size: 100, 30
+    }
+}
+
+[LEVEL_SELECT] {
+    alignment: center
+    layout: horizontal
+    {
+        type: panel
+        alignment: center
+        padding: 20
+        [LEVELS] {
+            layout: hexgrid
+        }
+    }
+    {
+        margin: 20
+        padding: 20
+        type: panel
+        size: 200, 300
+        layout: vertical
+        
+        {
+            stretch: true
+            layout: vertical
+            [LEVEL_KEY] {
+                type: label
+                caption: 
+                stretch: true
+                size: 1, 2
+            }
+            [LEVEL_NAME] {
+                type: label
+                caption: 
+                stretch: true
+                text_size: 15
+            }
+        }
+        [SAVE1] {
+            @ref: SAVEBUTTON IDX=1
+        }
+        [SAVE2] {
+            @ref: SAVEBUTTON IDX=2
+        }
+        [SAVE3] {
+            @ref: SAVEBUTTON IDX=3
+        }
+    }
+}
+
+[@LEVEL_BUTTON] {
+    type: button
+    size: 60, 60
+    style: actionbutton
+    position: {POS}
+    caption: {NAME}
+}
+
+[@SAVEBUTTON] {
+    type: button
+    caption: Save {IDX}
+    stretch: true
+    enabled: false
+    [SUBLABEL] {
+        type: label
+        text_size: 10
+        stretch: true
+        margin: 0, 0, 30, 0
+    }
+}

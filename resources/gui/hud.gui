@@ -1,0 +1,134 @@
+[ACTION_BAR] {
+    alignment: bottomleft
+    margin: 20
+    layout: hexgrid
+    [UPLEFT] {
+        type: actionbutton
+        size: 60, 60
+        position: 0, 0
+        caption: Q
+        keybinding: Q
+        image: action/arrow.png
+        rotation: 120
+    }
+    [LEFT] {
+        type: actionbutton
+        caption: A
+        keybinding: A
+        size: 60, 60
+        position: 0, 1
+        image: action/arrow.png
+        rotation: 180
+    }
+    [DOWNLEFT] {
+        type: actionbutton
+        caption: Z
+        keybinding: Z
+        size: 60, 60
+        position: 0, 2
+        image: action/arrow.png
+        rotation: 240
+    }
+
+    [UPRIGHT] {
+        type: actionbutton
+        caption: W
+        keybinding: W
+        size: 60, 60
+        position: 1, 0
+        image: action/arrow.png
+        rotation: 60
+    }
+    [RIGHT] {
+        type: actionbutton
+        caption: S
+        keybinding: S
+        size: 60, 60
+        position: 1, 1
+        image: action/arrow.png
+        rotation: 0
+    }
+    [DOWNRIGHT] {
+        type: actionbutton
+        caption: X
+        keybinding: X
+        size: 60, 60
+        position: 1, 2
+        image: action/arrow.png
+        rotation: -60
+    }
+    
+    [BIND] {
+        type: actionbutton
+        caption: E
+        keybinding: E
+        size: 60, 60
+        position: 2, 0
+        image: action/bind.png
+        imagesize: 50, 50
+    }
+    [DELETE] {
+        type: actionbutton
+        caption: D
+        keybinding: D
+        size: 60, 60
+        position: 2, 1
+        image: action/delete.png
+        imagesize: 50, 50
+    }
+    [PICKUP] {
+        type: actionbutton
+        caption: C
+        keybinding: C
+        size: 60, 60
+        position: 2, 2
+        image: action/pickup.png
+        imagesize: 30, 30
+    }
+
+    [SYNC] {
+        type: actionbutton
+        caption: V
+        keybinding: V
+        size: 60, 60
+        position: 3, 2
+        image: action/sync.png
+        imagesize: 30, 30
+    }
+}
+
+[SPEED_CONTROLS] {
+    alignment: bottomright
+    margin: 20
+    layout: horizontal
+    [STOP] {
+        type: actionbutton
+        size: 40, 40
+        image: gui/stop.png
+        imagesize: 20, 20
+    }
+    [PLAY] {
+        type: actionbutton
+        size: 40, 40
+        image: gui/play.png
+        imagesize: 20, 20
+    }
+    [FASTER] {
+        type: actionbutton
+        size: 40, 40
+        image: gui/fast-forward.png
+        imagesize: 20, 20
+    }
+}
+
+[GOAL] {
+    alignment: topright
+    margin: 20
+    layout: vertical
+    type: panel
+    [LABEL] {
+        type: label
+        caption: Goal: X/X
+        size: 200, 30
+    }
+}
