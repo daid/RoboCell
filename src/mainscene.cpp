@@ -10,12 +10,24 @@
 
 #include <sp2/io/filesystem.h>
 #include <sp2/graphics/gui/loader.h>
+#include <sp2/graphics/gui/widget/panel.h>
 #include <sp2/graphics/meshdata.h>
 #include <sp2/graphics/textureManager.h>
 #include <sp2/io/keybinding.h>
 #include <sp2/engine.h>
 #include <sp2/scene/camera.h>
 #include <sp2/math/plane.h>
+#include <sp2/stringutil/convert.h>
+#include <sp2/io/http/request.h>
+#include <nlohmann/json.hpp>
+
+
+#ifdef __EMSCRIPTEN__
+static int http_port = 443
+#else
+static int http_port = 80
+#endif
+
 
 sp::io::Keybinding key_space{"SPACE", " "};
 sp::io::Keybinding key_exit{"EXIT", {"Escape", "AC Back"}};
@@ -122,6 +134,23 @@ void Scene::onUpdate(float delta)
     }
 }
 
+void buildHistogram(sp::P<sp::gui::Widget> root, const nlohmann::json& data, float minvalue, float maxvalue, float myvalue)
+{
+    int bar_count = data.size();
+    int bin_max = 0;
+    for(int bin : data) bin_max = std::max(bin_max, bin);
+    int index = 0;
+    for(int bin : data) {
+        auto w = new sp::gui::Panel(root);
+        w->layout.size.x = 100.0f / float(bar_count);
+        w->layout.size.y = 100.0f * float(bin) / float(bin_max);
+        w->layout.position.x = w->layout.size.x * index;
+        w->layout.alignment = sp::Alignment::BottomLeft;
+
+        index++;
+    }
+}
+
 void Scene::onFixedUpdate()
 {
     int done = 0;
@@ -158,6 +187,28 @@ void Scene::onFixedUpdate()
             level_finished_info[level.key].cycles = std::min(level_finished_info[level.key].cycles, cycles);
             level_finished_info[level.key].actions = std::min(level_finished_info[level.key].actions, actions);
             level_finished_info[level.key].footprint = std::min(level_finished_info[level.key].footprint, footprint);
+
+            auto [main, sub] = level.key.partition("-");
+            auto level_id = sp::stringutil::convert::toInt(main) * 100 + sp::stringutil::convert::toInt(sub);
+            sp::io::http::Request("daid.eu", http_port).get("/game/stat.php?action=post&game_id=1&level_id=" + sp::string(level_id) + "&score_a="+sp::string(cycles) + "&score_b="+sp::string(actions)+"&score_c="+sp::string(footprint)+"&data=");
+            auto res = sp::io::http::Request("daid.eu", http_port).get("/game/stat.php?action=get&game_id=1&level_id=" + sp::string(level_id));
+            LOG(Debug, res.body);
+            if (res.body[0] == '{') {
+                auto json = nlohmann::json::parse(res.body);
+                buildHistogram(
+                    finished_screen->getWidgetWithID("CYCLES")->getWidgetWithID("HISTOGRAM"),
+                    json["a"], static_cast<float>(json["amin"]), static_cast<float>(json["amax"]),
+                    cycles);
+                buildHistogram(
+                    finished_screen->getWidgetWithID("ACTIONS")->getWidgetWithID("HISTOGRAM"),
+                    json["b"], static_cast<float>(json["bmin"]), static_cast<float>(json["bmax"]),
+                    cycles);
+                buildHistogram(
+                    finished_screen->getWidgetWithID("FOOTPRINT")->getWidgetWithID("HISTOGRAM"),
+                    json["c"], static_cast<float>(json["cmin"]), static_cast<float>(json["cmax"]),
+                    cycles);
+            }
+
             saveLevelFinishedInfo();
         } else {
             cycles += 1;
