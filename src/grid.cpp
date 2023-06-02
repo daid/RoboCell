@@ -79,6 +79,10 @@ void setGridAction(sp::Vector2i p, GridAction action) {
     case GridAction::PickupDrop: n->render_data.texture = sp::texture_manager.get("action/pickup.png"); break;
     case GridAction::Sync: n->render_data.texture = sp::texture_manager.get("action/sync.png"); break;
     case GridAction::Bind: n->render_data.texture = sp::texture_manager.get("action/bind.png"); break;
+    case GridAction::FlipFlopA: n->render_data.texture = sp::texture_manager.get("action/flipflopA.png"); break;
+    case GridAction::FlipFlopB: n->render_data.texture = sp::texture_manager.get("action/flipflopB.png"); break;
+    case GridAction::FlopFlipA: n->render_data.texture = sp::texture_manager.get("action/flipflopA.png"); break;
+    case GridAction::FlopFlipB: n->render_data.texture = sp::texture_manager.get("action/flipflopB.png"); break;
     }
     n->setPosition(gridToPos(p));
     action_node_grid.set(p, n);

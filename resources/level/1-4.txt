@@ -1,7 +1,6 @@
-Divide
+One for Two
 R -4 1 R #FF3333
 R -3 -1 R #3333FF
 S -2 0 antibody
 G 2 1 5 antibody
-G 3 0 5 antibody
 G 3 -1 5 antibody

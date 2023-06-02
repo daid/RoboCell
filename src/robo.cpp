@@ -78,6 +78,22 @@ void Robo::onFixedUpdate()
         case GridAction::PickupDrop: current_action = Action::PickupDrop; break;
         case GridAction::Sync: current_action = previous_action == Action::SyncWait ? Action::SyncWait : Action::SyncMove; break;
         case GridAction::Bind: current_action = Action::Bind; break;
+        case GridAction::FlipFlopA:
+            current_action = Action::TurnLeft;
+            setGridAction(grid_position, GridAction::FlipFlopB);
+            break;
+        case GridAction::FlipFlopB:
+            current_action = Action::TurnRight;
+            setGridAction(grid_position, GridAction::FlipFlopA);
+            break;
+        case GridAction::FlopFlipA:
+            current_action = Action::TurnLeft;
+            setGridAction(grid_position, GridAction::FlopFlipB);
+            break;
+        case GridAction::FlopFlipB:
+            current_action = Action::TurnRight;
+            setGridAction(grid_position, GridAction::FlopFlipA);
+            break;
         }
     }
     if (step == steps_per_action / 2) {

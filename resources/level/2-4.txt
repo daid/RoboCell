@@ -1,0 +1,10 @@
+Brain
+R -7 3 R #FF3333
+R -5 0 R #3333FF
+R -4 -2 R #33FF33
+S -4 2 antibody
+S -3 0 neuron
+G 6 0 10 antibody UR neuron L neuron DR neuron
+B 1 0 UR
+B 1 0 L
+B 1 0 DR

@@ -23,9 +23,9 @@
 
 
 #ifdef __EMSCRIPTEN__
-static int http_port = 443
+static int http_port = 443;
 #else
-static int http_port = 80
+static int http_port = 80;
 #endif
 
 
@@ -49,8 +49,9 @@ sp::io::Keybinding key_v{"V", "v"};
 
 
 Scene::Scene(int save_index) : sp::Scene("MAIN") {
-    goal_gui = sp::gui::Loader::load("gui/hud.gui", "GOAL");
-    speed_gui = sp::gui::Loader::load("gui/hud.gui", "SPEED_CONTROLS");
+    sp::gui::Loader gui_loader("gui/hud.gui");
+    goal_gui = gui_loader.create("GOAL");
+    speed_gui = gui_loader.create("SPEED_CONTROLS");
     speed_gui->getWidgetWithID("STOP")->setEventCallback([this](sp::Variant v){
         stop();
     });
@@ -65,7 +66,7 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
             sp::Engine::getInstance()->setGameSpeed(std::min(64.0f, sp::Engine::getInstance()->getGameSpeed() * 2.0f));
     });
 
-    action_bar = sp::gui::Loader::load("gui/hud.gui", "ACTION_BAR");
+    action_bar = gui_loader.create("ACTION_BAR");
     action_bar->getWidgetWithID("UPLEFT")->setEventCallback([this](sp::Variant) {
         setClickAction(GridAction::TurnToUpLeft);
     });
@@ -94,6 +95,10 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     action_bar->getWidgetWithID("PICKUP")->setEventCallback([this](sp::Variant) {
         setClickAction(GridAction::PickupDrop);
     });
+    action_bar->getWidgetWithID("FLIPFLOP")->setVisible(level.key == "3-1" || level_finished_info.find("3-1") != level_finished_info.end());
+    action_bar->getWidgetWithID("FLIPFLOP")->setEventCallback([this](sp::Variant) {
+        setClickAction(GridAction::FlipFlopA);
+    });
     action_bar->getWidgetWithID("SYNC")->setEventCallback([this](sp::Variant) {
         setClickAction(GridAction::Sync);
     });
@@ -112,6 +117,14 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     sp::Engine::getInstance()->setGameSpeed(0.0);
     this->save_index = save_index;
     onFixedUpdate();
+
+    if (!level.info.empty()) {
+        auto info_gui = gui_loader.create("INFO");
+        info_gui->getWidgetWithID("MESSAGE")->setAttribute("caption", level.info);
+        info_gui->getWidgetWithID("OK")->setEventCallback([info_gui] (sp::Variant) mutable {
+            info_gui.destroy();
+        });
+    }
 }
 
 Scene::~Scene()
@@ -276,7 +289,10 @@ void Scene::onPointerUp(sp::Ray3d ray, int id) {
     if (state == State::Build) {
         auto p3 = sp::Plane3d({0, 0, 0}, {0, 0, 1}).intersect(ray);
         auto p = posToGrid({p3.x, p3.y});
-        setGridAction(p, click_place_action);
+        if (click_place_action == GridAction::FlipFlopA && action_grid.get(p) == GridAction::FlipFlopA)
+            setGridAction(p, GridAction::FlopFlipB);
+        else
+            setGridAction(p, click_place_action);
         buildPathPreview();
     }
 }
@@ -292,6 +308,7 @@ void Scene::setClickAction(GridAction action) {
     action_bar->getWidgetWithID("BIND")->setAttribute("style", action == GridAction::Bind ? "actionbutton.selected" : "actionbutton");
     action_bar->getWidgetWithID("DELETE")->setAttribute("style", action == GridAction::None ? "actionbutton.selected" : "actionbutton");
     action_bar->getWidgetWithID("PICKUP")->setAttribute("style", action == GridAction::PickupDrop ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("FLIPFLOP")->setAttribute("style", action == GridAction::FlipFlopA ? "actionbutton.selected" : "actionbutton");
     action_bar->getWidgetWithID("SYNC")->setAttribute("style", action == GridAction::Sync ? "actionbutton.selected" : "actionbutton");
 }
 
@@ -319,6 +336,10 @@ void Scene::buildRobos() {
         r->grid_position = p;
         r->setPosition(gridToPos(p));
         r->direction = d;
+    }
+    for(auto [p, v] : action_grid) {
+        if (v == GridAction::FlipFlopB) setGridAction(p, GridAction::FlipFlopA);
+        if (v == GridAction::FlopFlipA) setGridAction(p, GridAction::FlopFlipB);
     }
     footprint_grid.clear();
 }

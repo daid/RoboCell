@@ -31,7 +31,7 @@
     }
     [panel] {
         image: gui/theme/square_filled.png#pixel
-		color: #FFFFFFB0
+		color: #FFFFFFD0
 		size: 8
         [overlay] {
             image: gui/theme/pixel.png

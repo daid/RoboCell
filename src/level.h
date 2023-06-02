@@ -8,6 +8,7 @@ class LevelData {
 public:
     sp::string key;
     sp::string name;
+    sp::string info;
     
     struct StartPoint {
         sp::Vector2i grid_point;

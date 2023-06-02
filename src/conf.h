@@ -15,3 +15,4 @@ extern std::shared_ptr<sp::MeshData> cell_bond_mesh;
 extern std::shared_ptr<sp::MeshData> goal_mesh;
 extern std::shared_ptr<sp::MeshData> goal_bond_mesh;
 extern std::shared_ptr<sp::MeshData> action_mesh;
+extern std::shared_ptr<sp::MeshData> path_mesh;

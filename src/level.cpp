@@ -25,13 +25,16 @@ void LevelData::load(sp::string key)
     spawn_points.clear();
     goal_points.clear();
     binders.clear();
+    info = "";
 
     auto stream = sp::io::ResourceProvider::get("level/" + key + ".txt");
     if (!stream) return;
     this->key = key;
     name = stream->readLine().strip();
     while(stream->tell() < stream->getSize()) {
-        auto parts = stream->readLine().split();
+        auto line = stream->readLine();
+        auto parts = line.split();
+        if (parts.size() < 1) continue;
         if (parts[0] == "R") { //Robo spawn
             level.start_points.push_back({
                 { sp::stringutil::convert::toInt(parts[1]), sp::stringutil::convert::toInt(parts[2])},
@@ -63,6 +66,9 @@ void LevelData::load(sp::string key)
             level.binders.push_back({
                 { sp::stringutil::convert::toInt(parts[1]), sp::stringutil::convert::toInt(parts[2])},
                 toDirection(parts[3])});
+        }
+        else if (parts[0] == "I") { //Info
+            level.info += line.substr(1).strip() + "\n"; 
         }
     }
 }

@@ -2,6 +2,7 @@
 #include "mainscene.h"
 #include "level.h"
 #include <sp2/graphics/gui/widget/button.h>
+#include <sp2/graphics/gui/widget/image.h>
 #include <sp2/graphics/gui/loader.h>
 #include <sp2/io/resourceProvider.h>
 #include <sp2/io/filesystem.h>
@@ -54,6 +55,13 @@ void openLevelSelect()
             can_play = true;
         if (!can_play)
             ab->disable();
+        if (level_finished_info.find(key) != level_finished_info.end()) {
+            auto check = new sp::gui::Image(ab);
+            check->setAttribute("alignment", "bottomright");
+            check->setAttribute("size", "20, 20");
+            check->setAttribute("image", "gui/checkmark.png");
+            check->setAttribute("margin", "12");
+        }
     }
     for(int save_index=1; save_index<=3; save_index++) {
         gui->getWidgetWithID("SAVE" + sp::string(save_index))->setEventCallback([save_index](sp::Variant) {

@@ -1,0 +1,11 @@
+Bone
+R -9 3 R #FF3333
+R -7 0 R #3333FF
+S -7 2 skin
+S -5 0 antibody
+B -2 0 L
+B -2 0 R
+B 3 0 UR
+B 3 0 L
+B 3 0 DR
+G 8 1 10 antibody L skin R skin DR antibody > L skin R skin DR antibody > L skin R skin DR antibody > L skin R skin

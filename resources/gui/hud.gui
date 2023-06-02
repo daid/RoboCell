@@ -86,6 +86,15 @@
         imagesize: 30, 30
     }
 
+    [FLIPFLOP] {
+        type: actionbutton
+        caption: F
+        keybinding: F
+        size: 60, 60
+        position: 3, 1
+        image: action/flipflop.png
+        imagesize: 30, 30
+    }
     [SYNC] {
         type: actionbutton
         caption: V
@@ -130,6 +139,35 @@
         type: label
         caption: Goal: X/X
         size: 200, 30
+    }
+}
+
+[INFO] {
+    alignment: center
+    type: panel
+    padding: 20
+    layout: vertical
+    
+    {
+        type: label
+        caption: IMPORTANT MESSAGE
+        size: 400, 30
+        margin: 0, 0, 0, 10
+        text_alignment: center
+    }
+    [MESSAGE] {
+        type: label
+        caption: This is the message...
+        size: 400, 100
+        text_alignment: left
+        text_size: 15
+    }
+
+    [OK] {
+        alignment: center
+        type: button
+        size: 150, 50
+        caption: OK
     }
 }
 

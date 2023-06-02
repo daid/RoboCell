@@ -1,8 +1,7 @@
-Nervous system
-R -6 3 R #FF3333
-R -4 -2 R #3333FF
-S -3 1 neuron
-S -2 0 neuron
-G 5 -1 10 neuron UR neuron > UR neuron
+Angle matter
+R -6 2 R #FF3333
+R -4 -1 R #3333FF
+S -4 2 skin
+S -2 -1 blood
+G 5 0 10 skin R blood
 B 1 0 UR
-B 1 -1 UR

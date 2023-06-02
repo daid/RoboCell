@@ -17,6 +17,10 @@ enum class GridAction
     PickupDrop,
     Sync,
     Bind,
+    FlipFlopA,
+    FlipFlopB,
+    FlopFlipA,
+    FlopFlipB,
 };
 
 extern sp::InfiniGrid<GridAction> action_grid;

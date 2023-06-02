@@ -1,4 +1,7 @@
 Binding in blood
+I This nanobot environment has a binder.
+I The binder will bind two cells together to
+I form a bigger organic structure.
 R -6 2 R #FF3333
 R -4 -1 R #3333FF
 S -4 2 blood
