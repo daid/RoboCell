@@ -33,4 +33,5 @@ sp::Vector2i gridOffset(Direction d);
 
 void setGridAction(sp::Vector2i p, GridAction action);
 void saveGrid(const sp::string& filename);
-void loadGrid(const sp::string& filename);
+void clearGrid();
+bool loadGrid(const sp::string& filename);

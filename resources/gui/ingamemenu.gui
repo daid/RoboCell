@@ -1,0 +1,35 @@
+[MENU] {
+    alignment: center
+    type: panel
+    padding: 20
+    layout: vertical
+    
+    {
+        type: label
+        caption: PAUSED
+        size: 200, 30
+        margin: 0, 0, 0, 10
+        text_alignment: center
+    }
+
+    [CLOSE] {
+        alignment: center
+        type: button
+        size: 150, 50
+        caption: Return
+    }
+
+    [CLEAR] {
+        alignment: center
+        type: button
+        size: 150, 50
+        caption: Clear level
+    }
+
+    [EXIT] {
+        alignment: center
+        type: button
+        size: 150, 50
+        caption: Exit
+    }
+}

@@ -70,6 +70,11 @@ void LevelData::load(sp::string key)
         else if (parts[0] == "I") { //Info
             level.info += line.substr(1).strip() + "\n"; 
         }
+        else if (parts[0] == "A") { //Action
+            level.preplaced_actions.push_back({
+                { sp::stringutil::convert::toInt(parts[1]), sp::stringutil::convert::toInt(parts[2])},
+                static_cast<GridAction>(sp::stringutil::convert::toInt(parts[3]))});
+        }
     }
 }
 

@@ -23,7 +23,7 @@ void openLevelSelect()
         auto main_i = sp::stringutil::convert::toInt(main);
         auto x = sub_i - 1;
         auto y = main_i - 1;
-        x += y / 2;
+        x -= y / 2;
         auto ab = new sp::gui::Button(container);
         ab->setSize({60, 60});
         ab->setAttribute("style", "actionbutton");

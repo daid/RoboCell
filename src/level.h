@@ -1,6 +1,7 @@
 #pragma once
 
 #include "direction.h"
+#include "grid.h"
 #include <sp2/graphics/color.h>
 #include <sp2/math/vector2.h>
 
@@ -38,6 +39,11 @@ public:
         Direction direction;
     };
     std::vector<Binder> binders;
+    struct Action {
+        sp::Vector2i grid_point;
+        GridAction action;
+    };
+    std::vector<Action> preplaced_actions;
 
     void load(sp::string key);
 };

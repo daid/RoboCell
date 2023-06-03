@@ -19,6 +19,7 @@
 #include <sp2/math/plane.h>
 #include <sp2/stringutil/convert.h>
 #include <sp2/io/http/request.h>
+#include <sp2/tween.h>
 #include <nlohmann/json.hpp>
 
 
@@ -29,8 +30,14 @@ static int http_port = 80;
 #endif
 
 
-sp::io::Keybinding key_space{"SPACE", " "};
+sp::io::Keybinding key_space{"SPACE", {" ", "Return", "Keypad Enter"}};
+sp::io::Keybinding key_ff{"FASTFORWARD", {"=", "Keypad +"}};
 sp::io::Keybinding key_exit{"EXIT", {"Escape", "AC Back"}};
+
+sp::io::Keybinding key_1{"1", "1"};
+sp::io::Keybinding key_2{"2", "2"};
+sp::io::Keybinding key_3{"3", "3"};
+
 sp::io::Keybinding key_q{"Q", "q"};
 sp::io::Keybinding key_a{"A", "a"};
 sp::io::Keybinding key_z{"Z", "z"};
@@ -47,9 +54,34 @@ sp::io::Keybinding key_r{"R", "r"};
 sp::io::Keybinding key_f{"F", "f"};
 sp::io::Keybinding key_v{"V", "v"};
 
+sp::io::Keybinding key_up{"UP", {"up", "keypad 8", "gamecontroller:0:button:dpup", "gamecontroller:0:axis:lefty"}};
+sp::io::Keybinding key_down{"DOWN", {"down", "keypad 2", "gamecontroller:0:button:dpdown"}};
+sp::io::Keybinding key_left{"LEFT", {"left", "keypad 4", "gamecontroller:0:button:dpleft"}};
+sp::io::Keybinding key_right{"RIGHT", {"right", "keypad 6", "gamecontroller:0:button:dpright", "gamecontroller:0:axis:leftx"}};
+
 
 Scene::Scene(int save_index) : sp::Scene("MAIN") {
     sp::gui::Loader gui_loader("gui/hud.gui");
+    menu_button = gui_loader.create("MENUBUTTON");
+    menu_button->setEventCallback([this](sp::Variant) {
+        if (ingame_menu) {
+            ingame_menu.destroy();
+            return;
+        }
+        ingame_menu = sp::gui::Loader::load("gui/ingamemenu.gui", "MENU");
+        ingame_menu->getWidgetWithID("CLEAR")->setEventCallback([this](sp::Variant) {
+            clearGrid();
+            buildPathPreview();
+        });
+        ingame_menu->getWidgetWithID("CLOSE")->setEventCallback([this](sp::Variant) {
+            ingame_menu.destroy();
+        });
+        ingame_menu->getWidgetWithID("EXIT")->setEventCallback([this](sp::Variant) {
+            saveGrid(sp::io::preferencePath() + level.key + "." + sp::string(this->save_index) + ".save");
+            delete this;
+            openLevelSelect();
+        });
+    });
     goal_gui = gui_loader.create("GOAL");
     speed_gui = gui_loader.create("SPEED_CONTROLS");
     speed_gui->getWidgetWithID("STOP")->setEventCallback([this](sp::Variant v){
@@ -57,11 +89,10 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     });
     speed_gui->getWidgetWithID("PLAY")->setEventCallback([this](sp::Variant v){
         start();
-        if (state == State::Run)
-            sp::Engine::getInstance()->setGameSpeed(1.0f);
     });
     speed_gui->getWidgetWithID("FASTER")->setEventCallback([this](sp::Variant v){
-        start();
+        if (state == State::Build)
+            start();
         if (state == State::Run)
             sp::Engine::getInstance()->setGameSpeed(std::min(64.0f, sp::Engine::getInstance()->getGameSpeed() * 2.0f));
     });
@@ -109,7 +140,11 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     camera->setRotation(sp::Quaterniond::fromAxisAngle({1, 0, 0}, 20));
     setDefaultCamera(camera);
 
-    loadGrid(sp::io::preferencePath() + level.key + "." + sp::string(save_index) + ".save");
+    if (!loadGrid(sp::io::preferencePath() + level.key + "." + sp::string(save_index) + ".save")) {
+        for(auto [p, a] : level.preplaced_actions) {
+            setGridAction(p, a);
+        }
+    }
     buildBackgroundGrid();
     buildLevelNodes();
     buildPathPreview();
@@ -119,9 +154,9 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     onFixedUpdate();
 
     if (!level.info.empty()) {
-        auto info_gui = gui_loader.create("INFO");
+        info_gui = gui_loader.create("INFO");
         info_gui->getWidgetWithID("MESSAGE")->setAttribute("caption", level.info);
-        info_gui->getWidgetWithID("OK")->setEventCallback([info_gui] (sp::Variant) mutable {
+        info_gui->getWidgetWithID("OK")->setEventCallback([this] (sp::Variant) mutable {
             info_gui.destroy();
         });
     }
@@ -129,6 +164,9 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
 
 Scene::~Scene()
 {
+    menu_button.destroy();
+    ingame_menu.destroy();
+    info_gui.destroy();
     action_bar.destroy();
     speed_gui.destroy();
     goal_gui.destroy();
@@ -137,13 +175,14 @@ Scene::~Scene()
 
 void Scene::onUpdate(float delta)
 {
-    if (key_space.getDown()) {
-        if (state == State::Build) start(); else stop();
-    }
-    if (key_exit.getDown()) {
-        saveGrid(sp::io::preferencePath() + level.key + "." + sp::string(save_index) + ".save");
-        delete this;
-        openLevelSelect();
+    double move_x = key_right.getValue() - key_left.getValue();
+    double move_y = key_up.getValue() - key_down.getValue();
+    if (move_x || move_y) {
+        auto camera_pos = getCamera()->getPosition3D();
+        camera_pos.x += move_x * 0.3;
+        camera_pos.y += move_y * 0.3;
+        getCamera()->setPosition(camera_pos);
+        background_grid->setPosition(gridToPos(posToGrid({camera_pos.x, camera_pos.y + 10})));
     }
 }
 
@@ -152,6 +191,7 @@ void buildHistogram(sp::P<sp::gui::Widget> root, const nlohmann::json& data, flo
     int bar_count = data.size();
     int bin_max = 0;
     for(int bin : data) bin_max = std::max(bin_max, bin);
+
     int index = 0;
     for(int bin : data) {
         auto w = new sp::gui::Panel(root);
@@ -159,9 +199,20 @@ void buildHistogram(sp::P<sp::gui::Widget> root, const nlohmann::json& data, flo
         w->layout.size.y = 100.0f * float(bin) / float(bin_max);
         w->layout.position.x = w->layout.size.x * index;
         w->layout.alignment = sp::Alignment::BottomLeft;
-
+        w->setAttribute("style", "histogram.bar");
         index++;
     }
+
+    auto w = new sp::gui::Panel(root);
+    w->layout.size.x = 2.5f;
+    w->layout.size.y = 100.0f;
+    w->layout.position.x = sp::Tween<float>::linear(myvalue, minvalue, maxvalue, 0.0f, 95.0f);
+    w->layout.alignment = sp::Alignment::BottomLeft;
+    w->setAttribute("style", "histogram.myscore");
+    w->setAttribute("order", "10");
+
+    root->getWidgetWithID("MIN")->setAttribute("caption", sp::string(int(minvalue)));
+    root->getWidgetWithID("MAX")->setAttribute("caption", sp::string(int(maxvalue)));
 }
 
 void Scene::onFixedUpdate()
@@ -215,11 +266,11 @@ void Scene::onFixedUpdate()
                 buildHistogram(
                     finished_screen->getWidgetWithID("ACTIONS")->getWidgetWithID("HISTOGRAM"),
                     json["b"], static_cast<float>(json["bmin"]), static_cast<float>(json["bmax"]),
-                    cycles);
+                    actions);
                 buildHistogram(
                     finished_screen->getWidgetWithID("FOOTPRINT")->getWidgetWithID("HISTOGRAM"),
                     json["c"], static_cast<float>(json["cmin"]), static_cast<float>(json["cmax"]),
-                    cycles);
+                    footprint);
             }
 
             saveLevelFinishedInfo();
@@ -242,6 +293,11 @@ void Scene::start()
         cycles = 0;
         break;
     case State::Run:
+        if (sp::Engine::getInstance()->getGameSpeed() == 0.0)
+            sp::Engine::getInstance()->setGameSpeed(1.0);
+        else
+            sp::Engine::getInstance()->setGameSpeed(0.0);
+        break;
     case State::Error:
     case State::Finished:
         break;
@@ -267,11 +323,13 @@ void Scene::stop()
 }
 
 bool dragging = false;
+bool pointer_delete = false;
 sp::Vector3d pointer_down_pos;
 bool Scene::onPointerDown(sp::io::Pointer::Button button, sp::Ray3d ray, int id) {
     auto p3 = sp::Plane3d({0, 0, 0}, {0, 0, 1}).intersect(ray);
     pointer_down_pos = p3;
     dragging = false;
+    pointer_delete = button == sp::io::Pointer::Button::Right;
     return true;
 }
 
@@ -289,10 +347,16 @@ void Scene::onPointerUp(sp::Ray3d ray, int id) {
     if (state == State::Build) {
         auto p3 = sp::Plane3d({0, 0, 0}, {0, 0, 1}).intersect(ray);
         auto p = posToGrid({p3.x, p3.y});
-        if (click_place_action == GridAction::FlipFlopA && action_grid.get(p) == GridAction::FlipFlopA)
-            setGridAction(p, GridAction::FlopFlipB);
-        else
-            setGridAction(p, click_place_action);
+        if (pointer_delete) {
+            setGridAction(p, GridAction::None);
+        } else if (click_place_action == action_grid.get(p)) {
+            if (click_place_action == GridAction::FlipFlopA && action_grid.get(p) == GridAction::FlipFlopA)
+                setGridAction(p, GridAction::FlopFlipB);
+            else
+                setGridAction(p, GridAction::None);
+        } else {
+                setGridAction(p, click_place_action);
+        }
         buildPathPreview();
     }
 }

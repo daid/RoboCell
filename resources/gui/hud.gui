@@ -2,6 +2,17 @@
     alignment: bottomleft
     margin: 20
     layout: hexgrid
+
+    [DELETE] {
+        type: actionbutton
+        caption: D
+        keybinding: D
+        size: 60, 60
+        position: 2, 1
+        image: gui/delete.png
+        imagesize: 30, 30
+    }
+
     [UPLEFT] {
         type: actionbutton
         size: 60, 60
@@ -60,21 +71,19 @@
     
     [BIND] {
         type: actionbutton
-        caption: E
-        keybinding: E
         size: 60, 60
-        position: 2, 0
+        position: 5, 0
         image: action/bind.png
         imagesize: 50, 50
     }
-    [DELETE] {
+    [FLIPFLOP] {
         type: actionbutton
-        caption: D
-        keybinding: D
+        caption: F
+        keybinding: F
         size: 60, 60
-        position: 2, 1
-        image: action/delete.png
-        imagesize: 50, 50
+        position: 3, 1
+        image: action/flipflop.png
+        imagesize: 30, 30
     }
     [PICKUP] {
         type: actionbutton
@@ -83,16 +92,6 @@
         size: 60, 60
         position: 2, 2
         image: action/pickup.png
-        imagesize: 30, 30
-    }
-
-    [FLIPFLOP] {
-        type: actionbutton
-        caption: F
-        keybinding: F
-        size: 60, 60
-        position: 3, 1
-        image: action/flipflop.png
         imagesize: 30, 30
     }
     [SYNC] {
@@ -121,13 +120,25 @@
         size: 40, 40
         image: gui/play.png
         imagesize: 20, 20
+        keybinding: SPACE
     }
     [FASTER] {
         type: actionbutton
         size: 40, 40
         image: gui/fast-forward.png
         imagesize: 20, 20
+        keybinding: FASTFORWARD
     }
+}
+
+[MENUBUTTON] {
+    alignment: topleft
+    margin: 20
+    type: actionbutton
+    size: 40, 40
+    keybinding: EXIT
+    image: gui/menu.png
+    imagesize: 20, 20
 }
 
 [GOAL] {
@@ -221,6 +232,22 @@
     [HISTOGRAM] {
         type: panel
         size: 100, 100
+        [MIN] {
+            type: label
+            alignment: topleft
+            text_alignment: topleft
+            caption: 100
+            text_size: 10
+            margin: 3
+        }
+        [MAX] {
+            type: label
+            alignment: topright
+            text_alignment: topright
+            caption: 100
+            text_size: 10
+            margin: 3
+        }
     }
     {
         type: label

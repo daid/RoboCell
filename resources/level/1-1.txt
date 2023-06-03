@@ -4,6 +4,8 @@ I Use your nanobots to move cells From the start
 I on the left to the goal on the right.
 I Note that nanobots can only
 I take 60 degree turns.
-R -3 0 R #FF3333
+R -4 1 DR #FF3333
+A -3 0 2
+A -1 0 7
 S -1 0 blood
 G 2 0 5 blood

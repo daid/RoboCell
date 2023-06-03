@@ -37,6 +37,14 @@
             image: gui/theme/pixel.png
             color: #000000A0
         }
+        [histogram.bar] {
+            image: gui/theme/pixel.png
+            color: #808080
+        }
+        [histogram.myscore] {
+            image: gui/theme/pixel.png
+            color: #80FF80
+        }
     }
     [navigator] {
         image: gui/theme/square.png#pixel

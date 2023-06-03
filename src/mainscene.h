@@ -29,6 +29,9 @@ public:
     sp::P<sp::Node> preview_base;
     sp::P<sp::Node> background_grid;
     sp::P<sp::Node> error_node;
+    sp::P<sp::gui::Widget> menu_button;
+    sp::P<sp::gui::Widget> ingame_menu;
+    sp::P<sp::gui::Widget> info_gui;
     sp::P<sp::gui::Widget> action_bar;
     sp::P<sp::gui::Widget> speed_gui;
     sp::P<sp::gui::Widget> goal_gui;

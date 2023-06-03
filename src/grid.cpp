@@ -101,19 +101,25 @@ void saveGrid(const sp::string& filename)
     sp::io::KeyValueTreeSaver::save(filename, tree);
 }
 
-void loadGrid(const sp::string& filename)
+void clearGrid()
 {
     action_grid.clear();
     for(auto it : action_node_grid) {
         sp::P<sp::Node>(it.data).destroy();
     }
     action_node_grid.clear();
+}
+
+bool loadGrid(const sp::string& filename)
+{
+    clearGrid();
     auto tree = sp::io::KeyValueTreeLoader::loadFile(filename);
-    if (!tree) return;
+    if (!tree) return false;
     for(auto n : tree->root_nodes) {
         auto x = sp::stringutil::convert::toInt(n.items["x"]);
         auto y = sp::stringutil::convert::toInt(n.items["y"]);
         auto action = sp::stringutil::convert::toInt(n.items["action"]);
         setGridAction({x, y}, static_cast<GridAction>(action));
     }
+    return true;
 }
