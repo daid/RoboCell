@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.6.0)
 project(RoboCell)
 
+set(SP2_ICON "icon.png")
+
 set(SP2_PATH "../SeriousProton2" CACHE STRING "Path to SeriousProton2 sources")
 get_filename_component(SP2_PATH ${SP2_PATH} ABSOLUTE)
 set(CMAKE_MODULE_PATH "${SP2_PATH}/cmake" ${CMAKE_MODULE_PATH})

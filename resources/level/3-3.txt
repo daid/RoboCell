@@ -1,0 +1,12 @@
+Bigger brain
+R -12 3 R #FF3333
+R -11 1 R #33FF33
+R -10 -1 R #3333FF
+S -9 3 blood
+S -7 -1 neuron
+B -4 3 L
+B -2 -1 L
+B 3 1 R
+B 3 1 UL
+B 3 1 DL
+G 8 1 10 blood L neuron > L blood ! UR neuron > UR blood ! DR neuron > DR blood

@@ -1,0 +1,15 @@
+Organism
+R -14 3 DR #FF3333
+R -13 1 R #33FF33
+R -12 -1 UR #3333FF
+S -9 4 blood
+S -8 2 neuron
+S -7 0 skin
+S -6 -2 antibody
+B -2 4 UL
+B -2 4 UR
+B 2 -4 DL
+B 2 -4 DR
+B 4 0 DL
+B 4 0 UR
+G 8 1 4 neuron L skin R skin UL skin UR skin DR antibody > R skin DR skin DL blood ! DL antibody > L skin DL skin DR blood

@@ -60,6 +60,10 @@ void LevelData::load(sp::string key)
                     bv = &bv->back().bonds;
                     idx++;
                 }
+                if (idx < int(parts.size()) && parts[idx] == "!") {
+                    bv = &level.goal_points.back().bonds;
+                    idx++;
+                }
             }
         }
         else if (parts[0] == "B") { //Binder

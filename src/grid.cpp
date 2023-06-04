@@ -123,3 +123,13 @@ bool loadGrid(const sp::string& filename)
     }
     return true;
 }
+
+sp::string gridToString()
+{
+    sp::string result;
+    for(auto [p, v] : action_grid) {
+        if (v == GridAction::None) continue;
+        result += sp::string(p.x) + "," + sp::string(p.y) + "," + sp::string(static_cast<int>(v)) + ",";
+    }
+    return result;
+}

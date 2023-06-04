@@ -46,7 +46,7 @@ static void buildSubPath(sp::Node* preview_base, std::unordered_set<VisitData>& 
                 node->render_data.texture = sp::texture_manager.get("path-turn.png");
                 node->setRotation(static_cast<int>(d) * -60 + 180);
             }
-            n -= 1;
+            n = std::max(0, n - 5);
         }
         if (action == GridAction::FlipFlopA || action == GridAction::FlopFlipB) {
             buildSubPath(preview_base, visited, color, p + gridOffset(d - 1), d - 1);
@@ -64,6 +64,8 @@ static void buildSubPath(sp::Node* preview_base, std::unordered_set<VisitData>& 
             node->render_data.color.a *= 0.5;
             node->setPosition(gridToPos(p));
             node->setRotation(static_cast<int>(d) * -60 + 60);
+
+            n = std::max(0, n - 5);
         }
 
         p += gridOffset(d);

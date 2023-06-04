@@ -11,25 +11,63 @@
         margin: 0, 0, 0, 10
         text_alignment: center
     }
+    
+    {
+        layout: horizontal
+        
+        {
+            layout: vertical
+            [CLOSE] {
+                alignment: center
+                type: button
+                size: 150, 50
+                caption: Return
+            }
 
-    [CLOSE] {
-        alignment: center
-        type: button
-        size: 150, 50
-        caption: Return
-    }
+            [CLEAR] {
+                alignment: center
+                type: button
+                size: 150, 50
+                caption: Clear level
+            }
 
-    [CLEAR] {
-        alignment: center
-        type: button
-        size: 150, 50
-        caption: Clear level
-    }
+            [EXIT] {
+                alignment: center
+                type: button
+                size: 150, 50
+                caption: Exit
+            }
+        }
 
-    [EXIT] {
-        alignment: center
-        type: button
-        size: 150, 50
-        caption: Exit
+        {
+            layout: vertical
+            [MUSIC] {
+                type: slider
+                size: 30, 130
+                range: 0, 100
+                alignment: center
+            }
+            {
+                type: label
+                caption: Music
+                size: 50, 20
+                text_size: 15
+            }
+        }
+        {
+            layout: vertical
+            [SFX] {
+                type: slider
+                size: 30, 130
+                range: 0, 100
+                alignment: center
+            }
+            {
+                type: label
+                caption: Sfx
+                size: 50, 20
+                text_size: 15
+            }
+        }
     }
 }

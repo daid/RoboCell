@@ -17,6 +17,8 @@
 #include <sp2/engine.h>
 #include <sp2/scene/camera.h>
 #include <sp2/math/plane.h>
+#include <sp2/audio/sound.h>
+#include <sp2/audio/music.h>
 #include <sp2/stringutil/convert.h>
 #include <sp2/io/http/request.h>
 #include <sp2/tween.h>
@@ -80,6 +82,14 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
             saveGrid(sp::io::preferencePath() + level.key + "." + sp::string(this->save_index) + ".save");
             delete this;
             openLevelSelect();
+        });
+        ingame_menu->getWidgetWithID("MUSIC")->setAttribute("value", sp::string(sp::audio::Music::getVolume()));
+        ingame_menu->getWidgetWithID("MUSIC")->setEventCallback([this](sp::Variant v) {
+            sp::audio::Music::setVolume(v.getDouble());
+        });
+        ingame_menu->getWidgetWithID("SFX")->setAttribute("value", sp::string(sp::audio::Sound::getVolume()));
+        ingame_menu->getWidgetWithID("SFX")->setEventCallback([this](sp::Variant v) {
+            sp::audio::Sound::setVolume(v.getDouble());
         });
     });
     goal_gui = gui_loader.create("GOAL");
@@ -248,14 +258,14 @@ void Scene::onFixedUpdate()
             finished_screen->getWidgetWithID("ACTIONS")->getWidgetWithID("AMOUNT")->setAttribute("caption", sp::string(actions));
             finished_screen->getWidgetWithID("FOOTPRINT")->getWidgetWithID("AMOUNT")->setAttribute("caption", sp::string(footprint));
 
-            level_finished_info[level.key].cycles = std::min(level_finished_info[level.key].cycles, cycles);
-            level_finished_info[level.key].actions = std::min(level_finished_info[level.key].actions, actions);
-            level_finished_info[level.key].footprint = std::min(level_finished_info[level.key].footprint, footprint);
+            level_finished_info[level.key].cycles = std::max(level_finished_info[level.key].cycles, cycles);
+            level_finished_info[level.key].actions = std::max(level_finished_info[level.key].actions, actions);
+            level_finished_info[level.key].footprint = std::max(level_finished_info[level.key].footprint, footprint);
 
             auto [main, sub] = level.key.partition("-");
             auto level_id = sp::stringutil::convert::toInt(main) * 100 + sp::stringutil::convert::toInt(sub);
-            sp::io::http::Request("daid.eu", http_port).get("/game/stat.php?action=post&game_id=1&level_id=" + sp::string(level_id) + "&score_a="+sp::string(cycles) + "&score_b="+sp::string(actions)+"&score_c="+sp::string(footprint)+"&data=");
-            auto res = sp::io::http::Request("daid.eu", http_port).get("/game/stat.php?action=get&game_id=1&level_id=" + sp::string(level_id));
+            sp::io::http::Request("daid.eu", http_port).get("/game/stat.php?action=post&game_id=2&level_id=" + sp::string(level_id) + "&score_a="+sp::string(cycles) + "&score_b="+sp::string(actions)+"&score_c="+sp::string(footprint)+"&data="+gridToString());
+            auto res = sp::io::http::Request("daid.eu", http_port).get("/game/stat.php?action=get&game_id=2&level_id=" + sp::string(level_id));
             LOG(Debug, res.body);
             if (res.body[0] == '{') {
                 auto json = nlohmann::json::parse(res.body);
