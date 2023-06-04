@@ -152,9 +152,9 @@ void Pawn::turn(int offset)
 
 std::vector<Pawn*> Pawn::allBonded()
 {
-    std::vector<Pawn*> result{{this}};
+    std::vector<Pawn*> result{this};
     std::unordered_set<Pawn*> done;
-    std::vector<Pawn*> todo{{this}};
+    std::vector<Pawn*> todo{this};
     done.insert(this);
 
     while(!todo.empty()) {

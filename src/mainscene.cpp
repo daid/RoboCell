@@ -84,11 +84,11 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
             openLevelSelect();
         });
         ingame_menu->getWidgetWithID("MUSIC")->setAttribute("value", sp::string(sp::audio::Music::getVolume()));
-        ingame_menu->getWidgetWithID("MUSIC")->setEventCallback([this](sp::Variant v) {
+        ingame_menu->getWidgetWithID("MUSIC")->setEventCallback([](sp::Variant v) {
             sp::audio::Music::setVolume(v.getDouble());
         });
         ingame_menu->getWidgetWithID("SFX")->setAttribute("value", sp::string(sp::audio::Sound::getVolume()));
-        ingame_menu->getWidgetWithID("SFX")->setEventCallback([this](sp::Variant v) {
+        ingame_menu->getWidgetWithID("SFX")->setEventCallback([](sp::Variant v) {
             sp::audio::Sound::setVolume(v.getDouble());
         });
     });
