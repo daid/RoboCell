@@ -1,6 +1,5 @@
 Bigger brain
 R -12 3 R #FF3333
-R -11 1 R #33FF33
 R -10 -1 R #3333FF
 S -9 3 blood
 S -7 -1 neuron

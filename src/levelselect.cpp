@@ -8,6 +8,9 @@
 #include <sp2/io/filesystem.h>
 #include <sp2/io/keyValueTreeLoader.h>
 #include <sp2/stringutil/convert.h>
+#include <sp2/audio/music.h>
+#include <sp2/audio/sound.h>
+
 
 static sp::P<sp::gui::Widget> gui;
 
@@ -69,4 +72,13 @@ void openLevelSelect()
             new Scene(save_index);
         });
     }
+
+    gui->getWidgetWithID("MUSIC")->setAttribute("value", sp::string(sp::audio::Music::getVolume()));
+    gui->getWidgetWithID("MUSIC")->setEventCallback([](sp::Variant v) {
+        sp::audio::Music::setVolume(v.getDouble());
+    });
+    gui->getWidgetWithID("SFX")->setAttribute("value", sp::string(sp::audio::Sound::getVolume()));
+    gui->getWidgetWithID("SFX")->setEventCallback([](sp::Variant v) {
+        sp::audio::Sound::setVolume(v.getDouble());
+    });
 }

@@ -2,12 +2,33 @@
 #include "grid.h"
 #include "pawn.h"
 #include "binder.h"
+#include "conf.h"
 #include "mainscene.h"
 
 #include <sp2/graphics/meshdata.h>
 #include <sp2/graphics/textureManager.h>
 #include <sp2/tween.h>
 #include <unordered_set>
+
+class HighlightHex : public sp::Node
+{
+public:
+    HighlightHex(sp::P<sp::Node> parent, sp::Vector2i grid_position)
+    : sp::Node(parent)
+    {
+        render_data.type = sp::RenderData::Type::Normal;
+        render_data.shader = sp::Shader::get("internal:basic.shader");
+        render_data.mesh = sp::MeshData::createQuad({2.0f, 2.0f});
+        render_data.texture = sp::texture_manager.get("hexagon.png");
+        setPosition(gridToPos(grid_position));
+    }
+
+    virtual void onUpdate(float delta) override {
+        render_data.color.a -= delta;
+        if (render_data.color.a <= 0.0f)
+            delete this;
+    }
+};
 
 
 Robo::Robo(sp::P<sp::Node> parent) : sp::Node(parent) {
@@ -97,6 +118,9 @@ void Robo::onFixedUpdate()
         }
     }
     if (step == steps_per_action / 2) {
+        auto hh = new HighlightHex(getParent(), grid_position);
+        hh->render_data.color = render_data.color;
+
         if (carry && current_action != Action::TurnLeft && current_action != Action::TurnRight) {
             for(auto c : carry->allBonded()) {
                 for(auto b : Binder::all) {

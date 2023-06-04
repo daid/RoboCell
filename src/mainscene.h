@@ -15,6 +15,7 @@ public:
     bool onPointerDown(sp::io::Pointer::Button button, sp::Ray3d ray, int id) override;
     void onPointerDrag(sp::Ray3d ray, int id) override;
     void onPointerUp(sp::Ray3d ray, int id) override;
+    bool onWheelMove(sp::Ray3d ray, sp::io::Pointer::Wheel direction) override;
 
     void setClickAction(GridAction action);
     void buildPathPreview();
@@ -47,4 +48,5 @@ public:
 
     int save_index = 0;
     int cycles = 0;
+    float zoom_angle = 30.0f;
 };

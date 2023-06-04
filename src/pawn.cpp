@@ -2,8 +2,11 @@
 #include "grid.h"
 #include "robo.h"
 #include "conf.h"
+#include <sp2/random.h>
 #include <sp2/graphics/mesh/obj.h>
 #include <sp2/graphics/textureManager.h>
+#include <sp2/scene/particleEmitter.h>
+#include <sp2/audio/sound.h>
 #include <unordered_set>
 
 
@@ -31,6 +34,10 @@ void PawnSpawn::onFixedUpdate()
     }
     auto p = new Pawn(getParent(), grid_position);
     p->render_data.texture = render_data.texture;
+
+    auto pe = new sp::ParticleEmitter(getParent(), "spawn.particle");
+    pe->setPosition(getPosition2D());
+    sp::audio::Sound::play("sfx/spawn" + sp::string(sp::irandom(0, 6)) + ".wav");
 }
 
 Pawn::Pawn(sp::P<sp::Node> parent, sp::Vector2i position)
@@ -181,4 +188,9 @@ void Pawn::makeBond(Direction direction) {
     visual->setRotation(r);
     bonds.push_back({direction, other, visual});
     other->bonds.push_back({direction + 3, this, visual});
+
+    auto pe = new sp::ParticleEmitter(getParent(), "bond.particle");
+    pe->setPosition(visual->getGlobalPosition2D());
+
+    sp::audio::Sound::play("sfx/bond.wav");
 }

@@ -12,6 +12,7 @@
 #include <sp2/graphics/textureManager.h>
 #include <sp2/graphics/meshdata.h>
 #include <sp2/graphics/mesh/obj.h>
+#include <sp2/audio/music.h>
 #include <sp2/audio/musicPlayer.h>
 #include <sp2/scene/scene.h>
 #include <sp2/scene/node.h>
@@ -61,9 +62,9 @@ int main(int argc, char** argv)
 #endif
     window->addLayer(scene_layer);
 
+    sp::audio::Music::setVolume(50.0f);
     loadLevelFinishedInfo();
-    openLevelSelect();
-    
+    openLevelSelect();    
     new sp::audio::MusicPlayer("music");
     engine->run();
 

@@ -19,6 +19,7 @@
                 layout: hexgrid
             }
         }
+
         {
             margin: 20
             padding: 20
@@ -50,6 +51,45 @@
             }
             [SAVE3] {
                 @ref: SAVEBUTTON IDX=3
+            }
+        }
+
+        {
+            margin: 0, 20
+            padding: 20
+            type: panel
+            layout: horizontal
+            alignment: center
+            
+            {
+                layout: vertical
+                [MUSIC] {
+                    type: slider
+                    size: 30, 130
+                    range: 0, 100
+                    alignment: center
+                }
+                {
+                    type: label
+                    caption: Music
+                    size: 50, 20
+                    text_size: 15
+                }
+            }
+            {
+                layout: vertical
+                [SFX] {
+                    type: slider
+                    size: 30, 130
+                    range: 0, 100
+                    alignment: center
+                }
+                {
+                    type: label
+                    caption: Sfx
+                    size: 50, 20
+                    text_size: 15
+                }
             }
         }
     }

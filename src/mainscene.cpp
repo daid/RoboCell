@@ -103,8 +103,11 @@ Scene::Scene(int save_index) : sp::Scene("MAIN") {
     speed_gui->getWidgetWithID("FASTER")->setEventCallback([this](sp::Variant v){
         if (state == State::Build)
             start();
-        if (state == State::Run)
+        if (state == State::Run) {
+            if (sp::Engine::getInstance()->getGameSpeed() == 0.0f)
+                sp::Engine::getInstance()->setGameSpeed(1.0f);
             sp::Engine::getInstance()->setGameSpeed(std::min(64.0f, sp::Engine::getInstance()->getGameSpeed() * 2.0f));
+        }
     });
 
     action_bar = gui_loader.create("ACTION_BAR");
@@ -340,6 +343,7 @@ bool Scene::onPointerDown(sp::io::Pointer::Button button, sp::Ray3d ray, int id)
     pointer_down_pos = p3;
     dragging = false;
     pointer_delete = button == sp::io::Pointer::Button::Right;
+    sp::audio::Sound::play("gui/theme/buttonDown.wav");
     return true;
 }
 
@@ -353,6 +357,7 @@ void Scene::onPointerDrag(sp::Ray3d ray, int id) {
 }
 
 void Scene::onPointerUp(sp::Ray3d ray, int id) {
+    sp::audio::Sound::play("gui/theme/buttonUp.wav");
     if (dragging) return;
     if (state == State::Build) {
         auto p3 = sp::Plane3d({0, 0, 0}, {0, 0, 1}).intersect(ray);
@@ -369,6 +374,19 @@ void Scene::onPointerUp(sp::Ray3d ray, int id) {
         }
         buildPathPreview();
     }
+}
+
+bool Scene::onWheelMove(sp::Ray3d ray, sp::io::Pointer::Wheel direction)
+{
+    switch(direction) {
+    case sp::io::Pointer::Wheel::Up: zoom_angle = zoom_angle + 3.0f; break;
+    case sp::io::Pointer::Wheel::Down: zoom_angle = zoom_angle - 3.0f; break;
+    case sp::io::Pointer::Wheel::Left: break;
+    case sp::io::Pointer::Wheel::Right: break;
+    }
+    zoom_angle = std::clamp(zoom_angle, 20.0f, 60.0f);
+    getCamera()->setPerspective(zoom_angle);
+    return true;
 }
 
 void Scene::setClickAction(GridAction action) {
@@ -453,8 +471,8 @@ void Scene::buildBackgroundGrid() {
 
     float w = std::sqrt(3.0f) * 1.0f;
     float h = 2.0f;
-    for(int x=-14; x<14; x++) {
-        for(int y=-10; y<10; y++) {
+    for(int x=-25; x<25; x++) {
+        for(int y=-10; y<17; y++) {
             auto idx = vertices.size();
             float cx = w * x + (y & 1) * w * 0.5;
             float cy = h * 3 / 4 * y;
@@ -495,5 +513,7 @@ void Scene::error(sp::Vector2d error_position)
         error_node->render_data.mesh = sp::MeshData::createQuad({1.5, 1.5});
         error_node->render_data.texture = sp::texture_manager.get("action/delete.png");
         error_node->render_data.color = sp::Color(1.0, 0.0, 0.0, 1.0);
+
+        sp::audio::Sound::play("sfx/error.wav");
     }
 }

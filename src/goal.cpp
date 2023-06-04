@@ -2,8 +2,10 @@
 #include "grid.h"
 #include "pawn.h"
 #include "conf.h"
+#include <sp2/engine.h>
 #include <sp2/graphics/mesh/obj.h>
 #include <sp2/graphics/textureManager.h>
+#include <sp2/audio/sound.h>
 
 
 GoalNode::GoalNode(sp::P<sp::Node> parent, sp::Vector2i position)
@@ -79,4 +81,9 @@ void Goal::onFixedUpdate()
     for(auto b : p->allBonded())
         delete b;
     done = std::min(done + 1, required);
+
+    if (sp::Engine::getInstance()->getGameSpeed() < 16.0f)
+        sp::Engine::getInstance()->setGameSpeed(sp::Engine::getInstance()->getGameSpeed() * 2.0f);
+
+    sp::audio::Sound::play("sfx/goal.wav");
 }
