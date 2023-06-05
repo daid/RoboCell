@@ -239,6 +239,7 @@
             caption: 100
             text_size: 10
             margin: 3
+            order: 20
         }
         [MAX] {
             type: label
@@ -247,6 +248,7 @@
             caption: 100
             text_size: 10
             margin: 3
+            order: 20
         }
     }
     {
