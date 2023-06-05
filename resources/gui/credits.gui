@@ -1,0 +1,84 @@
+[CREDITS] {
+    alignment: center
+    layout: vertical
+
+    {
+        @ref: HEAD
+        caption: Icons
+    }
+    {
+        @ref: LINE
+        caption: game-icons.net: quoting, delapouite, guard13007, delapouite
+    }
+    {
+        @ref: HEAD
+        caption: Font
+    }
+    {
+        @ref: LINE
+        caption: Audiowide by Astigmatic
+    }
+    {
+        @ref: HEAD
+        caption: Music
+    }
+    {
+        @ref: LINE
+        caption: "Factory on Mercury" by Eric Matyas Soundimage.org
+    }
+    {
+        @ref: LINE
+        caption: "Spaceman Factory" by Dan Knoflicek
+    }
+    {
+        @ref: LINE
+        caption: "Factorio Clone Music" by Alex McCulloch
+    }    
+    {
+        @ref: HEAD
+        caption: Sounds
+    }
+    {
+        @ref: LINE
+        caption: Squish sound by HonorHunter
+    }
+    {
+        @ref: LINE
+        caption: Plop sound by Angel Perez Grandi
+    }
+    {
+        @ref: LINE
+        caption: Error sound by BloodPixelHero
+    }
+    {
+        @ref: LINE
+        caption: Blup sound by bevibeldesign
+    }
+
+    {
+        @ref: HEAD
+        caption: Code, Art, Various, Other
+    }
+    {
+        @ref: LINE
+        caption: Daid
+    }
+    
+    [BACK] {
+        type: button
+        caption: Back
+        size: 150, 40
+    }
+}
+
+[@HEAD] {
+    type: label
+    text_size: 25
+    size: 150, 25
+}
+[@LINE] {
+    type: label
+    text_size: 15
+    margin: 10, 0
+    size: 150, 15
+}

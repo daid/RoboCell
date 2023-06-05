@@ -12,11 +12,30 @@
         alignment: center
         layout: horizontal
         {
-            type: panel
             alignment: center
-            padding: 20
-            [LEVELS] {
-                layout: hexgrid
+            layout: vertical
+            {
+                type: panel
+                alignment: center
+                padding: 20
+                margin: 0, 20
+                [LEVELS] {
+                    layout: hexgrid
+                }
+            }
+            {
+                alignment: center
+                layout: horizontal
+                [CREDITS] {
+                    type: button
+                    caption: Credits
+                    size: 150, 40
+                }
+                [QUIT] {
+                    type: button
+                    caption: Quit
+                    size: 150, 40
+                }
             }
         }
 

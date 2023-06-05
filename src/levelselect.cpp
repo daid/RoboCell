@@ -10,6 +10,7 @@
 #include <sp2/stringutil/convert.h>
 #include <sp2/audio/music.h>
 #include <sp2/audio/sound.h>
+#include <sp2/engine.h>
 
 
 static sp::P<sp::gui::Widget> gui;
@@ -81,4 +82,19 @@ void openLevelSelect()
     gui->getWidgetWithID("SFX")->setEventCallback([](sp::Variant v) {
         sp::audio::Sound::setVolume(v.getDouble());
     });
+
+    gui->getWidgetWithID("CREDITS")->setEventCallback([](sp::Variant) {
+        gui.destroy();
+        gui = sp::gui::Loader::load("gui/credits.gui", "CREDITS");
+        gui->getWidgetWithID("BACK")->setEventCallback([](sp::Variant) {
+            gui.destroy();
+            openLevelSelect();
+        });
+    });
+    gui->getWidgetWithID("QUIT")->setEventCallback([](sp::Variant v) {
+        sp::Engine::getInstance()->shutdown();
+    });
+#ifdef __EMSCRIPTEN__
+    gui->getWidgetWithID("QUIT")->hide();
+#endif
 }
