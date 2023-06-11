@@ -93,6 +93,9 @@ ActionButton::ActionButton(sp::P<sp::gui::Widget> parent)
     icon->layout.fill_height = true;
     icon->layout.fill_width = true;
     slave_widget = label;
+#ifdef ANDROID
+    label->hide();
+#endif
 }
 
 void ActionButton::setLabel(const sp::string& value)

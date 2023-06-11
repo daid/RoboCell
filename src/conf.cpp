@@ -17,11 +17,11 @@ static std::shared_ptr<sp::MeshData> createQuad(sp::Vector2f size, float z)
     return sp::MeshData::create(std::move(vertices), std::move(indices));
 }
 
-std::shared_ptr<sp::MeshData> binder_mesh = createQuad({1.5,0.8}, -0.06f);
-std::shared_ptr<sp::MeshData> cell_mesh = createQuad({1,1}, 0.05f);
-std::shared_ptr<sp::MeshData> cell_spawn_mesh = createQuad({1,1}, -0.06);
-std::shared_ptr<sp::MeshData> cell_bond_mesh = createQuad({1.5,0.8}, 0.025f);
-std::shared_ptr<sp::MeshData> goal_mesh = createQuad({1,1}, -0.08f);
-std::shared_ptr<sp::MeshData> goal_bond_mesh = createQuad({1.5, 0.8}, -0.09f);
+std::shared_ptr<sp::MeshData> binder_mesh = createQuad({0.8,0.8}, -0.06f);
+std::shared_ptr<sp::MeshData> cell_mesh = createQuad({cell_radius,cell_radius}, 0.05f);
+std::shared_ptr<sp::MeshData> cell_spawn_mesh = createQuad({cell_radius,cell_radius}, -0.06);
+std::shared_ptr<sp::MeshData> cell_bond_mesh = createQuad({0.8,0.8}, 0.025f);
+std::shared_ptr<sp::MeshData> goal_mesh = createQuad({cell_radius,cell_radius}, -0.08f);
+std::shared_ptr<sp::MeshData> goal_bond_mesh = createQuad({0.8, 0.8}, -0.09f);
 std::shared_ptr<sp::MeshData> action_mesh = createQuad({1,1}, -0.07f);
 std::shared_ptr<sp::MeshData> path_mesh = createQuad({2,2}, 0.0f);

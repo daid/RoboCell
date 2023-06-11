@@ -227,7 +227,7 @@ void Robo::onFixedUpdate()
             for(auto r : all) {
                 if (r == this || !r->carry) continue;
                 for(auto p2 : r->carry->allBonded()) {
-                    if ((p->getPosition2D() - p2->getPosition2D()).length() <= 1.0) {
+                    if ((p->getPosition2D() - p2->getPosition2D()).length() <= cell_radius) {
                         sp::P<Scene> scene = sp::Scene::get("MAIN");
                         scene->error((p->getPosition2D() + p2->getPosition2D()) * 0.5);
                     }
@@ -243,7 +243,7 @@ std::optional<sp::Vector2d> Robo::checkCarryCollision(sp::Vector2d world_positio
 {
     if (!carry) return {};
     for(auto p : carry->allBonded()) {
-        if ((p->getPosition2D() - world_position).length() <= 1.0)
+        if ((p->getPosition2D() - world_position).length() <= cell_radius)
             return (p->getPosition2D() + world_position) * 0.5;
     }
     return {};

@@ -266,3 +266,51 @@
         text_alignment: center
     }
 }
+
+[ACTION_POPUP] {
+    layout: hexgrid
+
+    [UPLEFT] {
+        type: actionbutton
+        size: 30, 30
+        position: 1, 0
+        image: action/arrow.png
+        rotation: 120
+    }
+    [LEFT] {
+        type: actionbutton
+        size: 30, 30
+        position: 0, 1
+        image: action/arrow.png
+        rotation: 180
+    }
+    [DOWNLEFT] {
+        type: actionbutton
+        size: 30, 30
+        position: 0, 2
+        image: action/arrow.png
+        rotation: 240
+    }
+
+    [UPRIGHT] {
+        type: actionbutton
+        size: 30, 30
+        position: 2, 0
+        image: action/arrow.png
+        rotation: 60
+    }
+    [RIGHT] {
+        type: actionbutton
+        size: 30, 30
+        position: 2, 1
+        image: action/arrow.png
+        rotation: 0
+    }
+    [DOWNRIGHT] {
+        type: actionbutton
+        size: 30, 30
+        position: 1, 2
+        image: action/arrow.png
+        rotation: -60
+    }
+}

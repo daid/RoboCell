@@ -37,8 +37,9 @@ public:
     sp::P<sp::gui::Widget> speed_gui;
     sp::P<sp::gui::Widget> goal_gui;
     sp::P<sp::gui::Widget> finished_screen;
+    sp::P<sp::gui::Widget> action_popup;
 
-    GridAction click_place_action = GridAction::None;
+    std::optional<GridAction> click_place_action;
     enum class State {
         Build,
         Run,

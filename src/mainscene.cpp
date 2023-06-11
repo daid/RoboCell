@@ -184,6 +184,7 @@ Scene::~Scene()
     speed_gui.destroy();
     goal_gui.destroy();
     finished_screen.destroy();
+    action_popup.destroy();
 }
 
 void Scene::onUpdate(float delta)
@@ -344,12 +345,14 @@ bool Scene::onPointerDown(sp::io::Pointer::Button button, sp::Ray3d ray, int id)
     dragging = false;
     pointer_delete = button == sp::io::Pointer::Button::Right;
     sp::audio::Sound::play("gui/theme/buttonDown.wav");
+    action_popup.destroy();
     return true;
 }
 
 void Scene::onPointerDrag(sp::Ray3d ray, int id) {
     auto p3 = sp::Plane3d({0, 0, 0}, {0, 0, 1}).intersect(ray);
     auto diff = p3 - pointer_down_pos;
+    if (!dragging && diff.length() < 0.2) return;
     auto camera_pos = getCamera()->getPosition3D() - diff;
     getCamera()->setPosition(camera_pos);
     background_grid->setPosition(gridToPos(posToGrid({camera_pos.x, camera_pos.y + 10})));
@@ -364,13 +367,30 @@ void Scene::onPointerUp(sp::Ray3d ray, int id) {
         auto p = posToGrid({p3.x, p3.y});
         if (pointer_delete) {
             setGridAction(p, GridAction::None);
-        } else if (click_place_action == action_grid.get(p)) {
-            if (click_place_action == GridAction::FlipFlopA && action_grid.get(p) == GridAction::FlipFlopA)
-                setGridAction(p, GridAction::FlopFlipB);
-            else
-                setGridAction(p, GridAction::None);
+        } else if (click_place_action.has_value())
+        {
+            if (click_place_action == action_grid.get(p)) {
+                if (click_place_action == GridAction::FlipFlopA && action_grid.get(p) == GridAction::FlipFlopA)
+                    setGridAction(p, GridAction::FlopFlipB);
+                else
+                    setGridAction(p, GridAction::None);
+            } else {
+                setGridAction(p, click_place_action.value());
+            }
         } else {
-                setGridAction(p, click_place_action);
+            auto wp = gridToPos(p);
+            auto screen = getCamera()->worldToScreen(sp::Vector3d(wp.x, wp.y, 0));
+            auto guip = action_bar->getScene()->getCamera()->screenToWorld(screen);
+            
+            action_popup = sp::gui::Loader::load("gui/hud.gui", "ACTION_POPUP");
+            action_popup->layout.position.x = guip.x - 90*0.5;
+            action_popup->layout.position.y = 480 - guip.y - 70*0.5;
+            action_popup->getWidgetWithID("UPLEFT")->setEventCallback([this, p](sp::Variant) { setGridAction(p, GridAction::TurnToUpLeft); buildPathPreview(); action_popup.destroy(); });
+            action_popup->getWidgetWithID("LEFT")->setEventCallback([this, p](sp::Variant) { setGridAction(p, GridAction::TurnToLeft); buildPathPreview(); action_popup.destroy(); });
+            action_popup->getWidgetWithID("DOWNLEFT")->setEventCallback([this, p](sp::Variant) { setGridAction(p, GridAction::TurnToDownLeft); buildPathPreview(); action_popup.destroy(); });
+            action_popup->getWidgetWithID("UPRIGHT")->setEventCallback([this, p](sp::Variant) { setGridAction(p, GridAction::TurnToUpRight); buildPathPreview(); action_popup.destroy(); });
+            action_popup->getWidgetWithID("RIGHT")->setEventCallback([this, p](sp::Variant) { setGridAction(p, GridAction::TurnToRight); buildPathPreview(); action_popup.destroy(); });
+            action_popup->getWidgetWithID("DOWNRIGHT")->setEventCallback([this, p](sp::Variant) { setGridAction(p, GridAction::TurnToDownRight); buildPathPreview(); action_popup.destroy(); });
         }
         buildPathPreview();
     }
@@ -390,18 +410,21 @@ bool Scene::onWheelMove(sp::Ray3d ray, sp::io::Pointer::Wheel direction)
 }
 
 void Scene::setClickAction(GridAction action) {
-    click_place_action = action;
-    action_bar->getWidgetWithID("UPLEFT")->setAttribute("style", action == GridAction::TurnToUpLeft ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("LEFT")->setAttribute("style", action == GridAction::TurnToLeft ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("DOWNLEFT")->setAttribute("style", action == GridAction::TurnToDownLeft ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("UPRIGHT")->setAttribute("style", action == GridAction::TurnToUpRight ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("RIGHT")->setAttribute("style", action == GridAction::TurnToRight ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("DOWNRIGHT")->setAttribute("style", action == GridAction::TurnToDownRight ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("BIND")->setAttribute("style", action == GridAction::Bind ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("DELETE")->setAttribute("style", action == GridAction::None ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("PICKUP")->setAttribute("style", action == GridAction::PickupDrop ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("FLIPFLOP")->setAttribute("style", action == GridAction::FlipFlopA ? "actionbutton.selected" : "actionbutton");
-    action_bar->getWidgetWithID("SYNC")->setAttribute("style", action == GridAction::Sync ? "actionbutton.selected" : "actionbutton");
+    if (click_place_action.has_value() && click_place_action.value() == action)
+        click_place_action.reset();
+    else
+        click_place_action = action;
+    action_bar->getWidgetWithID("UPLEFT")->setAttribute("style", click_place_action == GridAction::TurnToUpLeft ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("LEFT")->setAttribute("style", click_place_action == GridAction::TurnToLeft ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("DOWNLEFT")->setAttribute("style", click_place_action == GridAction::TurnToDownLeft ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("UPRIGHT")->setAttribute("style", click_place_action == GridAction::TurnToUpRight ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("RIGHT")->setAttribute("style", click_place_action == GridAction::TurnToRight ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("DOWNRIGHT")->setAttribute("style", click_place_action == GridAction::TurnToDownRight ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("BIND")->setAttribute("style", click_place_action == GridAction::Bind ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("DELETE")->setAttribute("style", click_place_action == GridAction::None ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("PICKUP")->setAttribute("style", click_place_action == GridAction::PickupDrop ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("FLIPFLOP")->setAttribute("style", click_place_action == GridAction::FlipFlopA ? "actionbutton.selected" : "actionbutton");
+    action_bar->getWidgetWithID("SYNC")->setAttribute("style", click_place_action == GridAction::Sync ? "actionbutton.selected" : "actionbutton");
 }
 
 void Scene::buildPathPreview() {

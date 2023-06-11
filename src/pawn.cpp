@@ -95,11 +95,11 @@ void Pawn::pickup()
 
 std::optional<sp::Vector2d> Pawn::checkCollision(sp::Vector2d world_position) {
     auto grid_position = posToGrid(world_position);
-    if (Pawn::grid.get(grid_position) && (gridToPos(grid_position) - world_position).length() <= 1.0) {
+    if (Pawn::grid.get(grid_position) && (gridToPos(grid_position) - world_position).length() <= cell_radius) {
         return (gridToPos(grid_position) + world_position) * 0.5;
     }
     for(auto d : allDirections) {
-        if (Pawn::grid.get(grid_position + gridOffset(d)) && (gridToPos(grid_position + gridOffset(d)) - world_position).length() <= 1.0)
+        if (Pawn::grid.get(grid_position + gridOffset(d)) && (gridToPos(grid_position + gridOffset(d)) - world_position).length() <= cell_radius)
             return (gridToPos(grid_position + gridOffset(d)) + world_position) * 0.5;
     }
     return {};
